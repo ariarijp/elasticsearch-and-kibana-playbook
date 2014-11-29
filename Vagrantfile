@@ -18,5 +18,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "pip install ansible"
   config.vm.provision "shell", inline: 'echo "StrictHostKeyChecking no" > ~/.ssh/config', privileged: false
   config.vm.provision "shell", inline: 'chmod 700 ~/.ssh/config && chown vagrant.vagrant ~/.ssh/config', privileged: false
-  config.vm.provision "shell", inline: "ansible-playbook -i /vagrant/hosts /vagrant/playbook.yml", privileged: false
+  config.vm.provision "shell", inline: "ansible-playbook -i /vagrant/vagrant_hosts /vagrant/playbook.yml", privileged: false
 end
