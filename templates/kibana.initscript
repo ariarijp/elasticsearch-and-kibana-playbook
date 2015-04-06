@@ -15,7 +15,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Kibana Backend Server"
 NAME=kibana
 PIDFILE=/var/run/$NAME.pid
-DAEMON=/opt/kibana-4.0.0-BETA2/bin/$NAME
+DAEMON=/opt/{{ kibana_version }}/bin/$NAME
 DAEMON_ARGS=""
 SCRIPTNAME=/etc/init.d/$NAME
 

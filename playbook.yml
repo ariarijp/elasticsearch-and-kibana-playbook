@@ -1,34 +1,29 @@
----
 - hosts: all
   sudo: yes
+  vars:
+    elasticsearch_version: elasticsearch-1.5.0
+    kibana_version: kibana-4.0.2-linux-x64
   tasks:
-    - name: "Elasticsearch 1.4.0、Kibana4 BETA2とテストデータ(shakespeare.json)をダウンロード"
+    - name: "Elasticsearch,Kibanaとテストデータ(shakespeare.json)をダウンロード"
       get_url: url={{ item }} dest=/tmp
       with_items:
-        - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.0.deb
-        - https://download.elasticsearch.org/kibana/kibana/kibana-4.0.0-BETA2.tar.gz
-        - http://www.elasticsearch.org/guide/en/kibana/current/snippets/shakespeare.json
-    - name: "Oracle Javaをインストールするためのaptリポジトリーを追加"
-      apt_repository: repo='ppa:webupd8team/java' update_cache=yes
-    - name: "Oracle Javaを自動的にインストールするための設定を書き込む"
-      shell: |
-        echo "oracle-java7-installer shared/accepted-oracle-license-v1-1 select true" > /tmp/oracle-license-debconf
-        /usr/bin/debconf-set-selections /tmp/oracle-license-debconf
-    - name: "日本語パックとOracle Javaをインストール"
-      apt: name={{ item }}
+        - https://download.elasticsearch.org/elasticsearch/elasticsearch/{{ elasticsearch_version }}.deb
+        - https://download.elasticsearch.org/kibana/kibana/{{ kibana_version }}.tar.gz
+        - http://www.elastic.co/guide/en/kibana/3.0/snippets/shakespeare.json
+    - name: "OpenJDKをインストール"
+      apt: name={{ item }} install_recommends=False cache_valid_time=300
       with_items:
-        - language-pack-ja
-        - oracle-java7-installer
+        - openjdk-7-jre-headless
     - name: "Elasticsearchをdebパッケージからインストール"
-      apt: deb=/tmp/elasticsearch-1.4.0.deb
+      apt: deb=/tmp/{{ elasticsearch_version }}.deb
     - name: "Elasticsearchを起動してサービスを有効化"
       service: name=elasticsearch state=started enabled=yes
     - name: "Elasticsearchの起動を待つ"
       wait_for: port=9200
     - name: "Kibana4のアーカイブを展開"
-      unarchive: copy=no src=/tmp/kibana-4.0.0-BETA2.tar.gz dest=/opt
+      unarchive: copy=no src=/tmp/{{ kibana_version }}.tar.gz dest=/opt
     - name: "Kibana4の起動スクリプトを転送"
-      copy: src=files/kibana.initscript dest=/etc/init.d/kibana mode=755
+      template: src=templates/kibana.initscript dest=/etc/init.d/kibana mode=755
     - name: "Kibana4を起動してサービスを有効化"
       service: name=kibana state=started enabled=yes
     - name: "テストデータのマッピングを作成。これを作成しないとspeakerやplay_nameがトークナイズされてしまう"

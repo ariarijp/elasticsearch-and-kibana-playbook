@@ -9,7 +9,7 @@ describe service('elasticsearch'), :if => os[:family] == 'ubuntu' do
   it { should be_running }
 end
 
-describe file('/opt/kibana-4.0.0-BETA2/bin/kibana') do
+describe file('/opt/kibana-4.0.2-linux-x64/bin/kibana') do
   it { should be_executable }
 end
 
