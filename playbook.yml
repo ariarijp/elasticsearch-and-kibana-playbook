@@ -38,6 +38,6 @@
     - name: "テストデータshakespeareの投入"
       shell: curl -XPOST 'localhost:9200/shakespeare/_bulk?pretty' --data-binary @/tmp/shakespeare.json
     - name: "テストデータaccountsの投入"
-      shell: cd /tmp && unzip /tmp/accounts.zip && curl -XPOST 'localhost:9200/bank/accounts/_bulk?pretty' --data-binary @/tmp/accounts.json
+      shell: cd /tmp && unzip accounts.zip && curl -XPOST 'localhost:9200/bank/accounts/_bulk?pretty' --data-binary @/tmp/accounts.json
     - name: "テストデータlogstashの投入"
-      shell: cd /tmp && gunzip /tmp/logs.jsonl.gz && curl -XPOST 'localhost:9200/_bulk?pretty' --data-binary @/tmp/logs.jsonl
+      shell: cd /tmp && gunzip logs.jsonl.gz && curl -XPOST 'localhost:9200/_bulk?pretty' --data-binary @/tmp/logs.jsonl
