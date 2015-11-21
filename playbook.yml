@@ -29,8 +29,6 @@
       template: src=templates/kibana.initscript dest=/etc/init.d/kibana mode=755
     - name: "Kibana4を起動してサービスを有効化"
       service: name=kibana state=started enabled=yes
-    - name: "Kibana4のアーカイブを展開"
-      unarchive: copy=no src=/tmp/kibana-{{ kibana_version }}-linux-x64.tar.gz dest=/opt
     - name: "テストデータshakespeareのマッピングを転送"
       copy: src=shakespeare_schema.json dest=/tmp
     - name: "テストデータshakespeareのマッピングを作成"
