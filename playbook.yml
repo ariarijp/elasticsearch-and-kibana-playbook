@@ -2,7 +2,7 @@
   sudo: yes
   vars:
     elasticsearch_version: 2.0.0
-    kibana_version: 4.2.0
+    kibana_version: 4.2.1
   tasks:
     - name: "OpenJDKとunzipをインストール"
       apt: name={{ item }} install_recommends=False update_cache=yes cache_valid_time=300
