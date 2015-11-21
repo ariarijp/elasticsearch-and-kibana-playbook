@@ -27,6 +27,10 @@
       unarchive: copy=no src=/tmp/kibana-{{ kibana_version }}-linux-x64.tar.gz dest=/opt
     - name: "Kibana4の起動スクリプトを転送"
       template: src=templates/kibana.initscript dest=/etc/init.d/kibana mode=755
+    - name: "Senseをインストール"
+      shell: cd /opt/kibana-{{ kibana_version }}-linux-x64 && ./bin/kibana plugin --install elastic/sense
+    - name: "Timelionをインストール"
+      shell: cd /opt/kibana-{{ kibana_version }}-linux-x64 && ./bin/kibana plugin --install kibana/timelion
     - name: "Kibana4を起動してサービスを有効化"
       service: name=kibana state=started enabled=yes
     - name: "テストデータshakespeareのマッピングを転送"
