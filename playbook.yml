@@ -1,28 +1,47 @@
 - hosts: all
   sudo: yes
+
   vars:
-    elasticsearch_version: 2.0.0
-    kibana_version: 4.2.1
+    elasticsearch_version: 2.1.0
+    kibana_version: 4.3.0
+    packetbeat_version: 1.0.0
+    topbeat_version: 1.0.0
+    filebeat_version: 1.0.0
+    beats_dashboards_version: 1.0.0
+
   tasks:
     - name: "OpenJDKとunzipをインストール"
       apt: name={{ item }} install_recommends=False update_cache=yes cache_valid_time=300
       with_items:
         - openjdk-7-jre-headless
         - unzip
-    - name: "Elasticsearch,Kibanaとテストデータをダウンロード"
+
+    - name: "Elasticsearch, Kibana, Beatsとテストデータをダウンロード"
       get_url: url={{ item }} dest=/tmp
       with_items:
         - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/{{ elasticsearch_version }}/elasticsearch-{{ elasticsearch_version }}.deb
         - https://download.elastic.co/kibana/kibana/kibana-{{ kibana_version }}-linux-x64.tar.gz
+        - https://download.elastic.co/beats/packetbeat/packetbeat_{{ packetbeat_version }}_amd64.deb
+        - https://download.elastic.co/beats/topbeat/topbeat_{{ topbeat_version }}_amd64.deb
+        - https://download.elastic.co/beats/filebeat/filebeat_{{ filebeat_version }}_amd64.deb
         - https://www.elastic.co/guide/en/kibana/3.0/snippets/shakespeare.json
         - https://github.com/bly2k/files/blob/master/accounts.zip?raw=true
         - https://download.elastic.co/demos/kibana/gettingstarted/logs.jsonl.gz
+
     - name: "Elasticsearchをdebパッケージからインストール"
       apt: deb=/tmp/elasticsearch-{{ elasticsearch_version }}.deb
+    - name: "Packetbeatをdebパッケージからインストール"
+      apt: deb=/tmp/packetbeat_{{ packetbeat_version }}_amd64.deb
+    - name: "Topbeatをdebパッケージからインストール"
+      apt: deb=/tmp/topbeat_{{ topbeat_version }}_amd64.deb
+    - name: "Filebeatをdebパッケージからインストール"
+      apt: deb=/tmp/filebeat_{{ filebeat_version }}_amd64.deb
+
     - name: "Elasticsearchを起動してサービスを有効化"
       service: name=elasticsearch state=started enabled=yes
     - name: "Elasticsearchの起動を待つ"
       wait_for: port=9200
+
     - name: "Kibana4のアーカイブを展開"
       unarchive: copy=no src=/tmp/kibana-{{ kibana_version }}-linux-x64.tar.gz dest=/opt
     - name: "Kibana4の起動スクリプトを転送"
@@ -33,6 +52,7 @@
       shell: cd /opt/kibana-{{ kibana_version }}-linux-x64 && ./bin/kibana plugin --install kibana/timelion
     - name: "Kibana4を起動してサービスを有効化"
       service: name=kibana state=started enabled=yes
+
     - name: "テストデータshakespeareのマッピングを転送"
       copy: src=shakespeare_schema.json dest=/tmp
     - name: "テストデータshakespeareのマッピングを作成"
@@ -43,3 +63,19 @@
       shell: cd /tmp && unzip accounts.zip && curl -XPOST 'localhost:9200/bank/accounts/_bulk?pretty' --data-binary @/tmp/accounts.json
     - name: "テストデータlogstashの投入"
       shell: cd /tmp && gunzip logs.jsonl.gz && curl -XPOST 'localhost:9200/_bulk?pretty' --data-binary @/tmp/logs.jsonl
+
+    - name: "Beatsのテンプレートを登録するスクリプトを転送"
+      copy: src=beats-templates.sh dest=/tmp mode=755
+    - name: "Beatsのダッシュボードを登録するスクリプトを転送"
+      template: src=templates/beats-dashboard.sh dest=/tmp mode=755
+    - name: Beatsのテンプレートを登録
+      shell: cd /tmp && ./beats-templates.sh
+    - name: Beatsのダッシュボードを登録
+      shell: cd /tmp && ./beats-dashboard.sh
+
+    - name: "Packetbeatを起動してサービスを有効化"
+      service: name=packetbeat state=started enabled=yes
+    - name: "Topbeatを起動してサービスを有効化"
+      service: name=topbeat state=started enabled=yes
+    - name: "Filebeatを起動してサービスを有効化"
+      service: name=filebeat state=started enabled=yes
