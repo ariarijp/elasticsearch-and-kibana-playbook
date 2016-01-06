@@ -2,12 +2,12 @@
   sudo: yes
 
   vars:
-    elasticsearch_version: 2.1.0
-    kibana_version: 4.3.0
-    packetbeat_version: 1.0.0
-    topbeat_version: 1.0.0
-    filebeat_version: 1.0.0
-    beats_dashboards_version: 1.0.0
+    elasticsearch_version: 2.1.1
+    kibana_version: 4.3.1
+    packetbeat_version: 1.0.1
+    topbeat_version: 1.0.1
+    filebeat_version: 1.0.1
+    beats_dashboards_version: 1.0.1
 
   tasks:
     - name: "OpenJDKとunzipをインストール"
