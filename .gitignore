@@ -2,3 +2,4 @@
 /.vagrant
 /.bundle
 /vendor
+/callback_plugins
